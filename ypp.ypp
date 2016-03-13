@@ -1,0 +1,35 @@
+%{
+#include "hpp.hpp"
+%}
+%defines %union { Sym*o; }
+%token <o> SYM STR					/* symbol 'string' number */
+%token <o> LP RP LQ RQ LC RC		/* () [] {} */
+%token <o> EQ AT COLON				/* = @ : */
+%token <o> ADD DIV					/* + / */
+%type <o> ex scalar list lambda		/* expression scalar [list] {lambda} */
+
+%left ADD
+%left DIV
+%left EQ
+%%
+REPL : | REPL ex 			{ cout << $2->dump();
+	 						cout << "\n-----------------------";
+	 						cout << $2->eval()->dump();
+							cout << "\n=======================\n"; } ;
+ex : scalar
+	| LQ list RQ			{ $$=$2; }
+	| LC lambda RC			{ $$=$2; }
+	| ex EQ ex				{ $$=$2; $$->push($1); $$->push($3); }
+	| ex AT ex				{ $$=$2; $$->push($1); $$->push($3); }
+	| ex ADD ex				{ $$=$2; $$->push($1); $$->push($3); }
+	| ex DIV ex				{ $$=$2; $$->push($1); $$->push($3); }
+;
+scalar : SYM | STR ;
+list :						{ $$=new List(); }
+	| list ex				{ $$=$1; $$->push($2); }
+;
+lambda :					{ $$=new Lambda(); }
+	| lambda SYM COLON		{ $$=$1; $$->par($2); }
+	| lambda ex				{ $$=$1; $$->push($2); }
+;
+%%

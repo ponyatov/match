@@ -1,0 +1,13 @@
+
+x.x = { X: X+'.'+X }	# dot-doubling
+
+x.x@src
+x.x@log
+ypp.ypp
+lpp.lpp
+hpp.hpp
+cpp.cpp
+Makefile
+bat.bat
+.gitignore
+
